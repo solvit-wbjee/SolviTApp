@@ -53,7 +53,7 @@ export const registrationUser = CatchAsyncError(
         path.join(__dirname, "../mails/activation-mail.ejs"),
         data
       );
-
+      
       try {
         await sendMail({
           email: user.email,
