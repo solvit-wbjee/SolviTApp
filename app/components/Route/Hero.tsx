@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React, { FC } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -63,6 +64,15 @@ const Hero: FC<Props> = (props) => {
                 <br />
             </div>
         </div>
+=======
+import React from 'react'
+
+type Props = {}
+
+const Hero = (props: Props) => {
+    return (
+        <div>Hero</div>
+>>>>>>> origin/master
     )
 }
 
