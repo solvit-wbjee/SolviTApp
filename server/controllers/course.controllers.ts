@@ -4,7 +4,7 @@ import ErrorHandler from "../utilities/ErrorHandeler";
 import cloudinary from 'cloudinary'
 import { createCourse, getAllCoursesService } from "../services/course.services";
 import CourseModel, { IComment } from "../models/course.model";
-import { connectRedis } from "../utilities/redis";
+import {redis } from "../utilities/redis";
 import mongoose from "mongoose";
 import path from "path";
 import ejs from "ejs"
