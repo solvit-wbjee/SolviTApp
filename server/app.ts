@@ -4,13 +4,16 @@ import express, { NextFunction, Request, Response } from 'express';
 export const app = express();
 import cors from 'cors';
 import cookieParser from 'cookie-parser'
-import { error } from 'console';
+import { ErrorMidllewire } from './middlewire/error';
+
+
 
 //body parser
 app.use(express.json({ limit: "50mb" }));
 
 //cookie-parser
 app.use(cookieParser());
+
 
 
 //cors=>cors origin resources sharing
@@ -30,5 +33,7 @@ app.get('/test', (req: Request, res: Response, next: NextFunction) => {
 app.all("*", (req: Request, res: Response, next: NextFunction) => {
     const err = new Error(`Route ${req.originalUrl} not found`) as any;
     err.StatusCode = 404 // Set the error status code to 404 (Not Found)
-    next(error); // Pass the error to the error handler middleware
+    next(err); // Pass the error to the error handler middleware
 });
+// Use the error handler middleware
+app.use(ErrorMidllewire);
