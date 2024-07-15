@@ -11,10 +11,10 @@
     "forceConsistentCasingInFileNames": true
   },
   "include": [
-    "SolviTApp/server//*"
+    "server/**/*"
   ],
   "exclude": [
     "node_modules",
-    "/*.spec.ts"
+    "*8/*.spec.ts"
   ]
 }
