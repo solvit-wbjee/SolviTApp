@@ -3,9 +3,9 @@ import express, { NextFunction, Request, Response } from "express";
 export const app = express();
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { ErrorHandler } from "./middlewire/error";
+import { ErrorMiddleware } from "./middleware/error";
 import userRouter from "./routes/user.route";
-import courseRouter from "./routes/course.routes";
+import courseRouter from "./routes/course.route";
 import orderRouter from "./routes/order.route";
 import notificationRouter from "./routes/notification.route";
 import analyticsRouter from "./routes/analytics.route";
@@ -22,7 +22,7 @@ app.use(cookieParser());
 // origin: process.env.ORIGIN,
 app.use(
     cors({
-        origin: ['http://localhost:3000'],
+        origin: ['http://localhost:3000', "https://elearninglms.netlify.app"],
         credentials: true,
     })
 );
