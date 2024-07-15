@@ -7,8 +7,15 @@
       "default",
       {
         "ignore": [
-          "@layer"
+          "@layer",
+          "-moz-appearance"
         ]
+      }
+    ],
+    "axe/forms": [
+      "default",
+      {
+        "label": "off"
       }
     ]
   }
