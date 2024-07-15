@@ -2,9 +2,9 @@ import mongoose, { Document, Model, Schema } from "mongoose";
 import { IUser } from "./user.model";
 
 export interface IComment extends Document {
-    user: IUser;
-    question: string;
-    questionReplies: IComment[];
+    user: IUser; //user
+    question: string; //question if any regarding course
+    questionReplies: IComment[]; // question replies
 }
 
 interface IReview extends Document {
@@ -32,6 +32,7 @@ interface ICourseData extends Document {
     questions: IComment[];
 }
 
+//video of course
 export interface ICourse extends Document {
     name: string;
     description: string;
@@ -50,6 +51,7 @@ export interface ICourse extends Document {
     purchased: number;
 }
 
+//review
 const reviewSchema = new Schema<IReview>({
     user: Object,
     rating: {
