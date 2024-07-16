@@ -37,7 +37,7 @@ export const registrationUser = CatchAsyncError(
       if (isEmailExist) {
         return next(new ErrorHandler("Email already exist", 400));
       }
-
+      
       const user: IRegistrationBody = {
         name,
         email,
@@ -181,8 +181,9 @@ export const logoutUser = CatchAsyncError(
     try {
       res.cookie("access_token", "", { maxAge: 1 });
       res.cookie("refresh_token", "", { maxAge: 1 });
-      // const userId = req.user?._id || "";
-      // redis.del(userId);
+      const userId = req.user?._id || "";
+      // console.log(req.user)
+      redis.del(userId);
       res.status(200).json({
         success: true,
         message: "Logged out successfully",
