@@ -1,5 +1,7 @@
+
 require("dotenv").config();
 import { Response } from "express";
+import jwt from "jsonwebtoken";
 import { IUser } from "../models/user.model";
 import { redis } from "./redis";
 
@@ -11,23 +13,20 @@ interface ITokenOptions {
   secure?: boolean;
 }
 
-// parse enviroment variables to integrates with fallback values
- const accessTokenExpire = parseInt(
-  process.env.ACCESS_TOKEN_EXPIRE || "300",
-  10
-);
-const refreshTokenExpire = parseInt(
-  process.env.REFRESH_TOKEN_EXPIRE || "1200",
-  10
-);
+// Parse environment variables
+const accessTokenExpire = parseInt(process.env.ACCESS_TOKEN_EXPIRE || "300", 10);
+const refreshTokenExpire = parseInt(process.env.REFRESH_TOKEN_EXPIRE || "1200", 10);
 
-// options for cookies
+const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
+const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
+
+// Options for cookies
 export const accessTokenOptions: ITokenOptions = {
-  expires: new Date(Date.now() + accessTokenExpire * 60  * 60 * 1000),
+  expires: new Date(Date.now() + accessTokenExpire * 60 * 60 * 1000),
   maxAge: accessTokenExpire * 60 * 60 * 1000,
   httpOnly: true,
   sameSite: "none",
-  secure:true,
+  secure: true,
 };
 
 export const refreshTokenOptions: ITokenOptions = {
@@ -38,12 +37,28 @@ export const refreshTokenOptions: ITokenOptions = {
   secure: true,
 };
 
-export const sendToken = (user: IUser, statusCode: number, res: Response) => {
-  const accessToken = user.SignAccessToken();
-  const refreshToken = user.SignRefreshToken();
+// Only set secure true for production
+if (process.env.NODE_ENV === "production") {
+  accessTokenOptions.secure = true;
+}
 
-  // upload session to redis
-  redis.set(user._id, JSON.stringify(user) as any,);
+export const sendToken = (user: IUser, statusCode: number, res: Response) => {
+  if (!accessTokenSecret || !refreshTokenSecret) {
+    return res.status(500).json({ success: false, message: "Secret keys are missing" });
+  }
+
+  const accessToken = jwt.sign({ id: user._id }, accessTokenSecret, {
+    expiresIn: accessTokenExpire,
+  });
+  const refreshToken = jwt.sign({ id: user._id }, refreshTokenSecret, {
+    expiresIn: refreshTokenExpire,
+  });
+
+  // Ensure user._id is treated as a string
+  const userId = String(user._id);
+
+  // Upload session to redis
+  redis.set(userId, JSON.stringify(user), 'EX', refreshTokenExpire * 24 * 60 * 60);
 
   res.cookie("access_token", accessToken, accessTokenOptions);
   res.cookie("refresh_token", refreshToken, refreshTokenOptions);
