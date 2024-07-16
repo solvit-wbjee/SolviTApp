@@ -126,7 +126,7 @@ export const getAllCourses = CatchAsyncError(
       );
 
       res.status(200).json({
-        success: true,
+        success: true,  
         courses,
       });
     } catch (error: any) {
@@ -181,7 +181,7 @@ export const addQuestion = CatchAsyncError(
 
       if (!mongoose.Types.ObjectId.isValid(contentId)) {
         return next(new ErrorHandler("Invalid content id", 400));
-      }
+      } 
 
       const couseContent = course?.courseData?.find((item: any) =>
         item._id.equals(contentId)
@@ -281,7 +281,7 @@ export const addAnwser = CatchAsyncError(
           name: question.user.name,
           title: couseContent.title,
         };
-
+        
         const html = await ejs.renderFile(
           path.join(__dirname, "../mails/question-reply.ejs"),
           data
@@ -322,8 +322,9 @@ export const addReview = CatchAsyncError(
       const userCourseList = req.user?.courses;
 
       const courseId = req.params.id;
-
+      
       // check if courseId already exists in userCourseList based on _id
+      
       const courseExists = userCourseList?.some(
         (course: any) => course._id.toString() === courseId.toString()
       );
