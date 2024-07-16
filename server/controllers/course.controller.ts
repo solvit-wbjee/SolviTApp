@@ -281,7 +281,7 @@ export const addAnwser = CatchAsyncError(
           name: question.user.name,
           title: couseContent.title,
         };
-
+        
         const html = await ejs.renderFile(
           path.join(__dirname, "../mails/question-reply.ejs"),
           data
@@ -322,8 +322,9 @@ export const addReview = CatchAsyncError(
       const userCourseList = req.user?.courses;
 
       const courseId = req.params.id;
-
+      
       // check if courseId already exists in userCourseList based on _id
+      
       const courseExists = userCourseList?.some(
         (course: any) => course._id.toString() === courseId.toString()
       );
