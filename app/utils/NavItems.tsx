@@ -77,8 +77,5 @@ const NavItems: React.FC<Props> = ({ activeItem, isMobile }) => {
     );
 };
 
-<<<<<<< HEAD
+
 export default NavItems;
-=======
-export default NavItems;
->>>>>>> origin/master

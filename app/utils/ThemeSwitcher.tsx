@@ -31,8 +31,4 @@ export const ThemeSwitcher = () => {
             )}
         </div>
     );
-<<<<<<< HEAD
 };
-=======
-};
->>>>>>> origin/master
