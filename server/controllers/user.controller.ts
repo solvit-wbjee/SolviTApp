@@ -191,6 +191,8 @@ export const logoutUser = CatchAsyncError(
       return next(new ErrorHandler(error.message, 400));
     }
   }
+
+  
 );
 
 // update access token
