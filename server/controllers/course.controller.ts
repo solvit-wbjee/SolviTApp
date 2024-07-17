@@ -13,12 +13,35 @@ import NotificationModel from "../models/notification.Model";
 import axios from "axios";
 
 // upload course
+// export const uploadCourse = CatchAsyncError(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       const data = req.body;
+//       const thumbnail = data.thumbnail;
+//       if (thumbnail) {
+//         const myCloud = await cloudinary.v2.uploader.upload(thumbnail, {
+//           folder: "courses",
+//         });
+
+//         data.thumbnail = {
+//           public_id: myCloud.public_id,
+//           url: myCloud.secure_url,
+//         };
+//       }
+//       createCourse(data, res, next);
+//     } catch (error: any) {
+//       return next(new ErrorHandler(error.message, 500));
+//     }
+//   }
+// );
 export const uploadCourse = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const data = req.body;
       const thumbnail = data.thumbnail;
-      if (thumbnail) {
+
+      // Check if thumbnail is a string
+      if (thumbnail && typeof thumbnail === 'string') {
         const myCloud = await cloudinary.v2.uploader.upload(thumbnail, {
           folder: "courses",
         });
@@ -28,7 +51,14 @@ export const uploadCourse = CatchAsyncError(
           url: myCloud.secure_url,
         };
       }
-      createCourse(data, res, next);
+
+      // Create the course with the processed data
+      const course = await CourseModel.create(data);
+
+      res.status(201).json({
+        success: true,
+        course,
+      });
     } catch (error: any) {
       return next(new ErrorHandler(error.message, 500));
     }
@@ -36,21 +66,73 @@ export const uploadCourse = CatchAsyncError(
 );
 
 // edit course
+// export const editCourse = CatchAsyncError(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       const data = req.body;
+
+//       const thumbnail = data.thumbnail;
+
+//       const courseId = req.params.id;
+
+//       const courseData = await CourseModel.findById(courseId) as any;
+
+//       // if (thumbnail && !thumbnail.startsWith("https")) {
+//       if (thumbnail ) {
+//         await cloudinary.v2.uploader.destroy(courseData.thumbnail.public_id);
+
+//         const myCloud = await cloudinary.v2.uploader.upload(thumbnail, {
+//           folder: "courses",
+//         });
+
+//         data.thumbnail = {
+//           public_id: myCloud.public_id,
+//           url: myCloud.secure_url,
+//         };
+//       }
+
+//       // if (thumbnail.startsWith("https")) {
+//       //   data.thumbnail = {
+//       //     public_id: courseData?.thumbnail.public_id,
+//       //     url: courseData?.thumbnail.url,
+//       //   };
+//       // }
+
+//       const course = await CourseModel.findByIdAndUpdate(
+//         courseId,
+//         {
+//           $set: data,
+//         },
+//         { new: true }
+//       );
+//       await redis.set(courseId, JSON.stringify(course)); // update course in redis
+//       res.status(201).json({
+//         success: true,
+//         course,
+//       });
+//     } catch (error: any) {
+//       return next(new ErrorHandler(error.message, 500));
+//     }
+//   }
+// );
+
 export const editCourse = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const data = req.body;
+      const courseId = req.params.id;
+      const courseData = await CourseModel.findById(courseId) as any;
 
       const thumbnail = data.thumbnail;
 
-      const courseId = req.params.id;
+      // If a new thumbnail is provided
+      if (thumbnail && typeof thumbnail === 'string' && !thumbnail.startsWith("http")) {
+        // Destroy the old image if exists
+        if (courseData.thumbnail.public_id) {
+          await cloudinary.v2.uploader.destroy(courseData.thumbnail.public_id);
+        }
 
-      const courseData = await CourseModel.findById(courseId) as any;
-
-      // if (thumbnail && !thumbnail.startsWith("https")) {
-      if (thumbnail ) {
-        await cloudinary.v2.uploader.destroy(courseData.thumbnail.public_id);
-
+        // Upload the new thumbnail
         const myCloud = await cloudinary.v2.uploader.upload(thumbnail, {
           folder: "courses",
         });
@@ -59,15 +141,12 @@ export const editCourse = CatchAsyncError(
           public_id: myCloud.public_id,
           url: myCloud.secure_url,
         };
+      } else {
+        // Preserve the existing thumbnail if not updated
+        data.thumbnail = courseData.thumbnail;
       }
 
-      // if (thumbnail.startsWith("https")) {
-      //   data.thumbnail = {
-      //     public_id: courseData?.thumbnail.public_id,
-      //     url: courseData?.thumbnail.url,
-      //   };
-      // }
-
+      // Update the course data in the database
       const course = await CourseModel.findByIdAndUpdate(
         courseId,
         {
@@ -75,8 +154,11 @@ export const editCourse = CatchAsyncError(
         },
         { new: true }
       );
-      await redis.set(courseId, JSON.stringify(course)); // update course in redis
-      res.status(201).json({
+
+      // Update the course in Redis (optional, ensure you have Redis setup correctly)
+      // await redis.set(courseId, JSON.stringify(course)); 
+
+      res.status(200).json({
         success: true,
         course,
       });
