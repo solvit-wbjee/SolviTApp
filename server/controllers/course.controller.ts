@@ -47,7 +47,8 @@ export const editCourse = CatchAsyncError(
 
       const courseData = await CourseModel.findById(courseId) as any;
 
-      if (thumbnail && !thumbnail.startsWith("https")) {
+      // if (thumbnail && !thumbnail.startsWith("https")) {
+      if (thumbnail ) {
         await cloudinary.v2.uploader.destroy(courseData.thumbnail.public_id);
 
         const myCloud = await cloudinary.v2.uploader.upload(thumbnail, {
@@ -60,12 +61,12 @@ export const editCourse = CatchAsyncError(
         };
       }
 
-      if (thumbnail.startsWith("https")) {
-        data.thumbnail = {
-          public_id: courseData?.thumbnail.public_id,
-          url: courseData?.thumbnail.url,
-        };
-      }
+      // if (thumbnail.startsWith("https")) {
+      //   data.thumbnail = {
+      //     public_id: courseData?.thumbnail.public_id,
+      //     url: courseData?.thumbnail.url,
+      //   };
+      // }
 
       const course = await CourseModel.findByIdAndUpdate(
         courseId,
@@ -90,7 +91,7 @@ export const getSingleCourse = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const courseId = req.params.id;
-
+//at a minute if 100000 people visit the course and details so 100000 hit generate but among them 20 people buy course so our server slows down so maintain this CacheExists code will written
       const isCacheExist = await redis.get(courseId);
 
       if (isCacheExist) {
