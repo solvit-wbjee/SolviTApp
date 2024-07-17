@@ -16,6 +16,7 @@
         "@eslint/object-schema": "^2.1.4",
         "@mui/icons-material": "^5.16.2",
         "@reduxjs/toolkit": "^2.2.6",
+        "axios": "^1.7.2",
         "formik": "^2.4.6",
         "glob": "^11.0.0",
         "lru-cache": "^11.0.0",

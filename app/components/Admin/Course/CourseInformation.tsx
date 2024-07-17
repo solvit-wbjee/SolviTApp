@@ -117,7 +117,7 @@ const CourseInformation: FC<Props> = ({
                 setCourseInfo({ ...courseInfo, price: e.target.value })
               }
               id="price"
-              placeholder="Enter Price..."
+              placeholder="Enter Price...(If it's free enter 0)"
               className={`
               ${styles.input}`}
             />
