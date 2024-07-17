@@ -473,6 +473,12 @@ export const generateVideoUrl = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { videoId } = req.body;
+
+      //For videmo video
+
+      // const {videoUrl}=req.body
+      // const videoId=videoUrl.split("/").pop()
+
       const response = await axios.post(
         `https://dev.vdocipher.com/api/videos/${videoId}/otp`,
         { ttl: 300 },
@@ -480,7 +486,7 @@ export const generateVideoUrl = CatchAsyncError(
           headers: {
             Accept: "application/json",
             "Content-Type": "application/json",
-            Authorization: `Apisecret ${process.env.VDOCIPHER_API_SECRET}`,
+            Authorization: `Apisecret ${process.env.VIMEO_API_SECRET}`,
           },
         }
       );
