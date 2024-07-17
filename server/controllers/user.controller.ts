@@ -197,6 +197,7 @@ export const logoutUser = CatchAsyncError(
 );
 
 // update access token
+// access token will expire soon (5m) but refresh token  expire (3d)
 export const updateAccessToken = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -241,7 +242,11 @@ export const updateAccessToken = CatchAsyncError(
       res.cookie("access_token", accessToken, accessTokenOptions);
       res.cookie("refresh_token", refreshToken, refreshTokenOptions);
 
-      await redis.set(user._id, JSON.stringify(user), "EX", 604800); // 7days
+      // await redis.set(user._id, JSON.stringify(user), "EX", 604800); // 7days
+      res.status(200).json({
+        status:"Success",
+        accessToken,
+      })
 
       return next();
     } catch (error: any) {
@@ -262,13 +267,15 @@ export const getUserInfo = CatchAsyncError(
   }
 );
 
+
+// social auth
+
 interface ISocialAuthBody {
   email: string;
   name: string;
   avatar: string;
 }
 
-// social auth
 export const socialAuth = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -295,10 +302,19 @@ interface IUpdateUserInfo {
 export const updateUserInfo = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { name } = req.body as IUpdateUserInfo;
+      const { name,email } = req.body as IUpdateUserInfo;
 
       const userId = req.user?._id;
       const user = await userModel.findById(userId);
+      if (email&& user)
+      {
+        const isEmailExist= await userModel.findOne({email})
+        if(isEmailExist)
+        {
+          return next(new ErrorHandler("Email Already Exists", 400));
+        }
+        user.email=email;
+      }
 
       if (name && user) {
         user.name = name;
@@ -328,11 +344,11 @@ export const updatePassword = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { oldPassword, newPassword } = req.body as IUpdatePassword;
-
+      
       if (!oldPassword || !newPassword) {
         return next(new ErrorHandler("Please enter old and new password", 400));
       }
-
+      
       const user = await userModel.findById(req.user?._id).select("+password");
 
       if (user?.password === undefined) {
@@ -361,11 +377,13 @@ export const updatePassword = CatchAsyncError(
   }
 );
 
+
+// update profile picture
+
 interface IUpdateProfilePicture {
   avatar: string;
 }
 
-// update profile picture
 export const updateProfilePicture = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {

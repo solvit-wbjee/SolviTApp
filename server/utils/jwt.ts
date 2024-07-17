@@ -1,46 +1,46 @@
 
-require("dotenv").config();
-import { Response } from "express";
-import jwt from "jsonwebtoken";
-import { IUser } from "../models/user.model";
-import { redis } from "./redis";
+// require("dotenv").config();
+// import { Response } from "express";
+// import jwt from "jsonwebtoken";
+// import { IUser } from "../models/user.model";
+// import { redis } from "./redis";
 
-interface ITokenOptions {
-  expires: Date;
-  maxAge: number;
-  httpOnly: boolean;
-  sameSite: "lax" | "strict" | "none" | undefined;
-  secure?: boolean;
-}
+// interface ITokenOptions {
+//   expires: Date;
+//   maxAge: number;
+//   httpOnly: boolean;
+//   sameSite: "lax" | "strict" | "none" | undefined;
+//   secure?: boolean;
+// }
 
-// Parse environment variables
-const accessTokenExpire = parseInt(process.env.ACCESS_TOKEN_EXPIRE || "300", 10);
-const refreshTokenExpire = parseInt(process.env.REFRESH_TOKEN_EXPIRE || "1200", 10);
+// // Parse environment variables
+// const accessTokenExpire = parseInt(process.env.ACCESS_TOKEN_EXPIRE || "300", 10);
+// const refreshTokenExpire = parseInt(process.env.REFRESH_TOKEN_EXPIRE || "1200", 10);
 
-const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
-const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
+// const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
+// const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
 
-// Options for cookies
-export const accessTokenOptions: ITokenOptions = {
-  expires: new Date(Date.now() + accessTokenExpire * 60 * 60 * 1000),
-  maxAge: accessTokenExpire * 60 * 60 * 1000,
-  httpOnly: true,
-  sameSite: "none",
-  secure: true,
-};
+// // Options for cookies
+// export const accessTokenOptions: ITokenOptions = {
+//   expires: new Date(Date.now() + accessTokenExpire * 60 * 60 * 1000),
+//   maxAge: accessTokenExpire * 60 * 60 * 1000,
+//   httpOnly: true,
+//   sameSite: "none",
+//   secure: true,
+// };
 
-export const refreshTokenOptions: ITokenOptions = {
-  expires: new Date(Date.now() + refreshTokenExpire * 24 * 60 * 60 * 1000),
-  maxAge: refreshTokenExpire * 24 * 60 * 60 * 1000,
-  httpOnly: true,
-  sameSite: "none",
-  secure: true,
-};
+// export const refreshTokenOptions: ITokenOptions = {
+//   expires: new Date(Date.now() + refreshTokenExpire * 24 * 60 * 60 * 1000),
+//   maxAge: refreshTokenExpire * 24 * 60 * 60 * 1000,
+//   httpOnly: true,
+//   sameSite: "none",
+//   secure: true,
+// };
 
-// Only set secure true for production
-if (process.env.NODE_ENV === "production") {
-  accessTokenOptions.secure = true;
-}
+// // Only set secure true for production
+// if (process.env.NODE_ENV === "production") {
+//   accessTokenOptions.secure = true;
+// }
 
 // export const sendToken = (user: IUser, statusCode: number, res: Response) => {
 //   if (!accessTokenSecret || !refreshTokenSecret) {
@@ -86,6 +86,43 @@ if (process.env.NODE_ENV === "production") {
 
 //written code
 
+
+
+require("dotenv").config();
+import { Response } from "express";
+import jwt from "jsonwebtoken";
+import { IUser } from "../models/user.model";
+import { redis } from "./redis";
+
+interface ITokenOptions {
+  expires: Date;
+  maxAge: number;
+  httpOnly: boolean;
+  sameSite: "lax" | "strict" | "none" | undefined;
+  secure?: boolean;
+}
+
+// Parse environment variables
+//parse environent to intrigates with fall back value
+const accessTokenExpire = parseInt(process.env.ACCESS_TOKEN_EXPIRE || "300", 10);
+const refreshTokenExpire = parseInt(process.env.REFRESH_TOKEN_EXPIRE || "1200", 10);
+
+const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
+const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
+
+export const accessTokenOptions: ITokenOptions = {
+  expires: new Date(Date.now() + accessTokenExpire * 60 * 60 * 1000),//5m accessTokenExpire=5
+  maxAge: accessTokenExpire * 60 * 60 * 1000,
+  httpOnly: true,
+  sameSite: "lax"
+}
+export const refreshTokenOptions: ITokenOptions = {
+  expires: new Date(Date.now() + refreshTokenExpire * 24 * 60 * 60 * 1000),//3d refreshTokenExpire=3
+  maxAge: refreshTokenExpire * 24 * 60 * 60 * 1000,
+  httpOnly: true,
+  sameSite: "lax"
+}
+
 export const sendToken = (user: IUser, statusCode: number, res: Response) => {
   const accessToken = user.SignAccessToken();
   const refreshToken = user.SignRefreshToken();
@@ -93,26 +130,10 @@ export const sendToken = (user: IUser, statusCode: number, res: Response) => {
   // Upload session to redis
   redis.set(user._id, JSON.stringify(user) as any);
 
-  //parse environent to intrigates with fall back value
-  const accessTokenExpire = parseInt(
-    process.env.ACCESS_TOKEN_EXPIRE || "300", 10
-  )
-  const refreshTokenExpire = parseInt(
-    process.env.REFRESH_TOKEN_EXPIRE || "1200", 10
-  )
+  
+ 
   //option for cookies
-  const accessTokenOptions: ITokenOptions = {
-    expires: new Date(Date.now() + accessTokenExpire * 1000),
-    maxAge: accessTokenExpire * 1000,
-    httpOnly: true,
-    sameSite: "lax"
-  }
-  const refreshTokenOptions: ITokenOptions = {
-    expires: new Date(Date.now() + refreshTokenExpire * 1000),
-    maxAge: refreshTokenExpire * 1000,
-    httpOnly: true,
-    sameSite: "lax"
-  }
+
 
   //only set Secure to true in production
   if (process.env.NODE_ENV === "production") {
