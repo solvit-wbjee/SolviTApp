@@ -11,7 +11,7 @@ export const getNotifications = CatchAsyncError(
       const notifications = await NotificationModel.find().sort({
         createdAt: -1,
       });
-
+//createdAt: -1, means the new one comes at top and old one after that
       res.status(201).json({
         success: true,
         notifications,
@@ -22,7 +22,7 @@ export const getNotifications = CatchAsyncError(
   }
 );
 
-// update notification status --- only admin
+// update notification status --- only admin(read notificatin)
 export const updateNotification = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -51,9 +51,11 @@ export const updateNotification = CatchAsyncError(
   }
 );
 
-// delete notification --- only admin
+// delete read notification --- only admin
+
 cron.schedule("0 0 0 * * *", async() => {
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
   await NotificationModel.deleteMany({status:"read",createdAt: {$lt: thirtyDaysAgo}});
   console.log('Deleted read notifications');
 });
+
