@@ -1,5 +1,4 @@
 "use client";
-import { title } from "process";
 import React, { useEffect, useState } from "react";
 import CourseInformation from "./CourseInformation";
 import CourseOptions from "./CourseOptions";
@@ -7,7 +6,7 @@ import CourseData from "./CourseData";
 import CourseContent from "./CourseContent";
 import CoursePreview from "./CoursePreview";
 import { useCreateCourseMutation } from "../../../../redux/features/courses/coursesApi";
-import toast from "react-hot-toast";
+import { toast } from "react-hot-toast";
 import { redirect } from "next/navigation";
 
 type Props = {};
@@ -38,12 +37,12 @@ const CreateCourse = (props: Props) => {
     tags: "",
     level: "",
     categories: "",
+    courseyear: "",
     demoUrl: "",
     thumbnail: "",
   });
   const [benefits, setBenefits] = useState([{ title: "" }]);
   const [prerequisites, setPrerequisites] = useState([{ title: "" }]);
-
   const [courseContentData, setCourseContentData] = useState([
     {
       videoUrl: "",
@@ -60,6 +59,7 @@ const CreateCourse = (props: Props) => {
       suggestion: "",
     },
   ]);
+
   const [courseData, setCourseData] = useState({});
 
   const handleSubmit = async () => {
@@ -87,11 +87,13 @@ const CreateCourse = (props: Props) => {
         suggestion: courseContent.suggestion,
       })
     );
-    // prepare data object
+
+    //   prepare our data object
     const data = {
       name: courseInfo.name,
       description: courseInfo.description,
       categories: courseInfo.categories,
+      courseyear: courseInfo.courseyear,
       price: courseInfo.price,
       estimatedPrice: courseInfo.estimatedPrice,
       tags: courseInfo.tags,
@@ -108,9 +110,9 @@ const CreateCourse = (props: Props) => {
 
   const handleCourseCreate = async (e: any) => {
     const data = courseData;
-    // if (!isLoading) {
-    await createCourse(data);
-    // }
+    if (!isLoading) {
+      await createCourse(data);
+    }
   };
 
   return (

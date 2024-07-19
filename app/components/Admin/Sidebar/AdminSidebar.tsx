@@ -122,7 +122,7 @@ const Sidebar = () => {
               >
                 <Link href="/" className="block">
                   <h3 className="text-[25px] font-Poppins uppercase dark:text-white text-black">
-                    Solvit
+                    SolviT
                   </h3>
                 </Link>
                 <IconButton
@@ -245,8 +245,15 @@ const Sidebar = () => {
               setSelected={setSelected}
             />
             <Item
-              title="Categories"
+              title="Exams"
               to="/admin/categories"
+              icon={<WysiwygIcon />}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Exam Year"
+              to="/admin/courseyear"
               icon={<WysiwygIcon />}
               selected={selected}
               setSelected={setSelected}

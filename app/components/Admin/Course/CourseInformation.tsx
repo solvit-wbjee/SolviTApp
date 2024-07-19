@@ -1,4 +1,5 @@
 import { styles } from "@/app/styles/style";
+import { useGetHeroDataQuery } from "@/redux/features/layout/layoutApi";
 import React, { FC, useEffect, useState } from "react";
 
 type Props = {
@@ -15,14 +16,21 @@ const CourseInformation: FC<Props> = ({
   setActive,
 }) => {
   const [dragging, setDragging] = useState(false);
-  // const { data } = useGetHeroDataQuery("Categories", {});
+  const { data } = useGetHeroDataQuery("Categories", {});
   const [categories, setCategories] = useState([]);
+  const [courseyear, setCourseyear] = useState([]);
 
-  // useEffect(() => {
-  //   if (data) {
-  //     setCategories(data.layout?.categories);
-  //   }
-  // }, [data]);
+  useEffect(() => {
+    if (data) {
+      setCategories(data.layout?.categories);
+    }
+  }, [data]);
+
+  useEffect(() => {
+    if (data) {
+      setCourseyear(data.layout?.courseyaer);
+    }
+  }, [data]);
 
   const handleSubmit = (e: any) => {
     e.preventDefault();
@@ -83,9 +91,9 @@ const CourseInformation: FC<Props> = ({
               setCourseInfo({ ...courseInfo, name: e.target.value })
             }
             id="name"
-            placeholder="Enter Course name..."
+            placeholder="Enter Course Name"
             className={`
-              ${styles.input}`}
+            ${styles.input}`}
           />
         </div>
         <br />
@@ -117,9 +125,9 @@ const CourseInformation: FC<Props> = ({
                 setCourseInfo({ ...courseInfo, price: e.target.value })
               }
               id="price"
-              placeholder="Enter Price...(If it's free enter 0)"
+              placeholder="29"
               className={`
-              ${styles.input}`}
+            ${styles.input}`}
             />
           </div>
           <div className="w-[50%]">
@@ -134,9 +142,9 @@ const CourseInformation: FC<Props> = ({
                 setCourseInfo({ ...courseInfo, estimatedPrice: e.target.value })
               }
               id="price"
-              placeholder="Enter Estimated Price"
+              placeholder="79"
               className={`
-              ${styles.input}`}
+            ${styles.input}`}
             />
           </div>
         </div>
@@ -155,15 +163,13 @@ const CourseInformation: FC<Props> = ({
                 setCourseInfo({ ...courseInfo, tags: e.target.value })
               }
               id="tags"
-              placeholder="wbjee,Physics,Math,NEET,Chemistry"
+              placeholder="Wbjee, Neet"
               className={`
-              ${styles.input}`}
+            ${styles.input}`}
             />
           </div>
           <div className="w-[50%]">
-            <label className={`${styles.label} w-[50%]`}>
-              Course Categories
-            </label>
+            <label className={`${styles.label} w-[50%]`}>Select exams</label>
             <select
               name=""
               id=""
@@ -174,10 +180,39 @@ const CourseInformation: FC<Props> = ({
               }
             >
               <option className="dark:bg-[#000] text-[#fff]" value="">
-                Select Category
+                Select Exams
               </option>
               {categories &&
                 categories.map((item: any) => (
+                  <option
+                    className="dark:bg-[#000] text-[#fff]"
+                    value={item.title}
+                    key={item._id}
+                  >
+                    {item.title}
+                  </option>
+                ))}
+            </select>
+          </div>
+        </div>
+        <br />
+        <div>
+          <div className="w-[50%]">
+            <label className={`${styles.label} w-[50%]`}>Exam Year</label>
+            <select
+              name=""
+              id=""
+              className={`${styles.input}`}
+              value={courseInfo.courseyear}
+              onChange={(e: any) =>
+                setCourseInfo({ ...courseInfo, courseyear: e.target.value })
+              }
+            >
+              <option className="dark:bg-[#000] text-[#fff]" value="">
+                Select Year
+              </option>
+              {courseyear &&
+                courseyear.map((item: any) => (
                   <option
                     className="dark:bg-[#000] text-[#fff]"
                     value={item.title}
@@ -204,11 +239,11 @@ const CourseInformation: FC<Props> = ({
               id="level"
               placeholder="Beginner/Intermediate/Expert"
               className={`
-              ${styles.input}`}
+            ${styles.input}`}
             />
           </div>
           <div className="w-[50%]">
-            <label className={`${styles.label} w-[50%]`}>Course Url</label>
+            <label className={`${styles.label} w-[50%]`}>Demo Url</label>
             <input
               type="text"
               name=""
@@ -218,9 +253,9 @@ const CourseInformation: FC<Props> = ({
                 setCourseInfo({ ...courseInfo, demoUrl: e.target.value })
               }
               id="demoUrl"
-              placeholder="Enter Course Url E.g. wbjee, wb-jee, physics, math, jee-math"
+              placeholder="Enter Demo Url"
               className={`
-              ${styles.input}`}
+            ${styles.input}`}
             />
           </div>
         </div>

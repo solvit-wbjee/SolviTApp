@@ -4,16 +4,16 @@ import { userLoggedIn, userLoggedOut, userRegistration } from "./authSlice";
 type RegistrationResponse = {
   message: string;
   activationToken: string;
-  // Update the type of 'user' property as per your requirement
 };
 
-type Registrationdata = {};
+type RegistrationData = {};
 
 export const authApi = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
-    register: builder.mutation<RegistrationResponse, Registrationdata>({
+    // endpoints here
+    register: builder.mutation<RegistrationResponse, RegistrationData>({
       query: (data) => ({
-        url: "/auth/register",
+        url: "registration",
         method: "POST",
         body: data,
         credentials: "include" as const,
@@ -27,7 +27,7 @@ export const authApi = apiSlice.injectEndpoints({
             })
           );
         } catch (error: any) {
-          console.error(error);
+          console.log(error);
         }
       },
     }),
@@ -35,14 +35,20 @@ export const authApi = apiSlice.injectEndpoints({
       query: ({ activation_token, activation_code }) => ({
         url: "activate-user",
         method: "POST",
-        body: { activation_token, activation_code },
+        body: {
+          activation_token,
+          activation_code,
+        },
       }),
     }),
     login: builder.mutation({
       query: ({ email, password }) => ({
         url: "login",
         method: "POST",
-        body: { email, password },
+        body: {
+          email,
+          password,
+        },
         credentials: "include" as const,
       }),
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {

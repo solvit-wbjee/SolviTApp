@@ -1,15 +1,13 @@
 "use client";
 import React from "react";
-import AdminSidebar from "../../../components/Admin/Sidebar/AdminSidebar";
-import Heading from "../../../../app/utils/Heading";
-import DashboardHeader from "../../../../app/components/Admin/DashboardHeader";
-import EditCourse from "../../../components/Admin/Course/EditCourse";
+import AdminSidebar from "../../components/Admin/Sidebar/AdminSidebar";
+import Heading from "../../../app/utils/Heading";
+import OrdersAnalytics from "../../components/Admin/Analytics/OrdersAnalytics";
+import DashboardHeader from "../../../app/components/Admin/DashboardHeader";
 
 type Props = {};
 
-const page = ({ params }: any) => {
-  const id = params?.id;
-
+const page = (props: Props) => {
   return (
     <div>
       <Heading
@@ -23,7 +21,7 @@ const page = ({ params }: any) => {
         </div>
         <div className="w-[85%]">
           <DashboardHeader />
-          <EditCourse id={id} />
+          <OrdersAnalytics />
         </div>
       </div>
     </div>
