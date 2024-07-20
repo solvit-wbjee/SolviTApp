@@ -160,6 +160,7 @@ export interface IAnswer extends Document {
   content: string;
   likes: number;
   dislikes: number;
+  // videoFiled:String
 }
 
 export interface IQuestion extends Document {
@@ -238,6 +239,12 @@ const answerSchema = new Schema<IAnswer>({
     type: String,
     required: true,
   },
+  // videoFiled: {
+  //   type: String,
+   
+
+  // },
+    
   likes: {
     type: Number,
     default: 0,
