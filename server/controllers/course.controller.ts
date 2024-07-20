@@ -818,8 +818,6 @@ export const DeleteSubject = CatchAsyncError(async (req: Request, res: Response,
 // Adding a Question to a Subject
 
 
-
-
 export const AddQuestToSubject = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { courseId, yearId, subjectId } = req.params;
@@ -854,22 +852,33 @@ export const AddQuestToSubject = CatchAsyncError(async (req: Request, res: Respo
       })
     );
 
-    const course = await CourseModel.findById(courseId);
+    // Fetch the course
+    const course = await CourseModel.findById(courseId)
+      .populate({
+        path: 'years.subjects',
+        populate: {
+          path: 'questions'
+        }
+      });
+
     if (!course) {
       return res.status(404).json({ success: false, message: "Course not found" });
     }
 
+    // Check for the year
     const year = course.years.id(yearId);
     if (!year) {
       return res.status(404).json({ success: false, message: "Year not found" });
     }
 
+    // Check for the subject
     const subject = year.subjects.id(subjectId);
     if (!subject) {
-      return res.status(404).json({ success: false, message: "Subject not found" });
+      return res.status(404).json({ success: false, message: `Subject not found with ID: ${subjectId}` });
     }
 
-    subject.questions.push({ text: processedText, answers: uploadedAnswers });
+    // Add the question
+    subject.questions.push({ type: processedText.type, content: processedText.content, answers: uploadedAnswers });
     await course.save();
 
     res.status(201).json({
@@ -882,9 +891,13 @@ export const AddQuestToSubject = CatchAsyncError(async (req: Request, res: Respo
     });
 
   } catch (error: any) {
+    console.error(error); // Improved error logging
     return next(new ErrorHandler(error.message, 500));
   }
-})
+});
+
+
+
 
 // Edit Question
 export const EditQuestion = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {

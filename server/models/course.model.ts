@@ -144,13 +144,6 @@
 // export default CourseModel;
 
 
-
-
-
-
-
-
-
 import mongoose, { Document, Model, Schema } from "mongoose";
 import { IUser } from "./user.model";
 
@@ -164,7 +157,8 @@ export interface IAnswer extends Document {
 }
 
 export interface IQuestion extends Document {
-  text: string;
+  type: string;
+  content: string;
   answers: IAnswer[];
 }
 
@@ -241,10 +235,10 @@ const answerSchema = new Schema<IAnswer>({
   },
   // videoFiled: {
   //   type: String,
-   
+
 
   // },
-    
+
   likes: {
     type: Number,
     default: 0,
@@ -256,7 +250,12 @@ const answerSchema = new Schema<IAnswer>({
 });
 
 const questionSchema = new Schema<IQuestion>({
-  text: {
+  type: {
+    type: String,
+    enum: ["text", "image", "video", "link"],
+    required: true,
+  },
+  content: {
     type: String,
     required: true,
   },
@@ -371,3 +370,9 @@ const courseSchema = new Schema<ICourse>({
 const CourseModel: Model<ICourse> = mongoose.model("Course", courseSchema);
 
 export default CourseModel;
+
+
+
+
+
+
