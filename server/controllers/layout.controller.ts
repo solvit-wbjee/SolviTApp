@@ -47,17 +47,17 @@ export const createLayout = CatchAsyncError(
       }
       if (type === "Categories") {
         const { categories } = req.body;
-        //   const categoriesItems = await Promise.all(
-        //     categories.map(async (item: any) => {
-        //       return {
-        //         title: item.title,
-        //       };
-        //     })
-        //   );
-        //   await LayoutModel.create({
-        //     type: "Categories",
-        //     categories: categoriesItems,
-        //   });
+          const categoriesItems = await Promise.all(
+            categories.map(async (item: any) => {
+              return {
+                title: item.title,
+              };
+            })
+          );
+          await LayoutModel.create({
+            type: "Categories",
+            categories: categoriesItems,
+          });
         
         
       }
