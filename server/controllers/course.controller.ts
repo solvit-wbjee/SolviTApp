@@ -598,6 +598,37 @@ import axios from "axios";
 
 
 
+// export const uploadCourse = CatchAsyncError(
+//   async (req: Request, res: Response, next: NextFunction) => {
+//     try {
+//       const data = req.body;
+//       const thumbnail = data.thumbnail;
+
+//       // Check if thumbnail is a string
+//       if (thumbnail && typeof thumbnail === 'string') {
+//         const myCloud = await cloudinary.v2.uploader.upload(thumbnail, {
+//           folder: "courses",
+//         });
+
+//         data.thumbnail = {
+//           public_id: myCloud.public_id,
+//           url: myCloud.secure_url,
+//         };
+//       }
+
+//       // Create the course with the processed data
+//       const course = await CourseModel.create(data);
+
+//       res.status(201).json({
+//         success: true,
+//         course,
+//       });
+//     } catch (error: any) {
+//       return next(new ErrorHandler(error.message, 500));
+//     }
+//   }
+// );
+
 export const uploadCourse = CatchAsyncError(
   async (req: Request, res: Response, next: NextFunction) => {
     try {
@@ -616,8 +647,11 @@ export const uploadCourse = CatchAsyncError(
         };
       }
 
+      // Remove `years` from the data before creating the course
+      const { years, ...courseData } = data;
+
       // Create the course with the processed data
-      const course = await CourseModel.create(data);
+      const course = await CourseModel.create(courseData);
 
       res.status(201).json({
         success: true,
