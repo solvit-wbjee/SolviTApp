@@ -33,6 +33,7 @@ export const createLayout = CatchAsyncError(
       }
       if (type === "FAQ") {
         const { faq } = req.body;
+        await LayoutModel.create(faq);
         const faqItems = await Promise.all(
           faq.map(async (item: any) => {
             return {
@@ -41,23 +42,25 @@ export const createLayout = CatchAsyncError(
             };
           })
         );
-        await LayoutModel.create({ type: "FAQ", faq: faqItems });
+       const temp =  await LayoutModel.create({ type: "FAQ", faq: faqItems });
+       console.log(temp)
       }
       if (type === "Categories") {
         const { categories } = req.body;
-        const categoriesItems = await Promise.all(
-          categories.map(async (item: any) => {
-            return {
-              title: item.title,
-            };
-          })
-        );
-        await LayoutModel.create({
-          type: "Categories",
-          categories: categoriesItems,
-        });
+        //   const categoriesItems = await Promise.all(
+        //     categories.map(async (item: any) => {
+        //       return {
+        //         title: item.title,
+        //       };
+        //     })
+        //   );
+        //   await LayoutModel.create({
+        //     type: "Categories",
+        //     categories: categoriesItems,
+        //   });
+        
+        
       }
-
       res.status(200).json({
         success: true,
         message: "Layout created successfully",
@@ -141,7 +144,7 @@ export const editLayout = CatchAsyncError(
       });
     } catch (error: any) {
       console.log(error);
-      
+
       return next(new ErrorHandler(error.message, 500));
     }
   }
