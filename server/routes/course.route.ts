@@ -95,7 +95,8 @@ import {
   EditSubject,
   DeleteSubject,
   EditQuestion,
-  DeleteQuestion
+  DeleteQuestion,
+  UpdateQuestInSubject
 } from "../controllers/course.controller";
 import { authorizeRoles, isAutheticated } from "../middleware/auth";
 
@@ -120,12 +121,14 @@ courseRouter.post(
   },
   AddYeartoCourse);
 
+  //add subject to year
 courseRouter.post(
   "/course/:courseId/year/:yearId/subject",
   isAutheticated,
   authorizeRoles("admin"),
   AddSubjectToYear)
 
+  //Add question to subject
 courseRouter.post(
   "/course/:courseId/year/:yearId/subject/:subjectId/question",
   isAutheticated,
@@ -133,6 +136,23 @@ courseRouter.post(
   uploadImage,
   authorizeRoles("admin"),
 )
+
+// Update a question
+courseRouter.put(
+  "/course/:courseId/year/:yearId/subject/:subjectId/question/:questionId",
+  isAutheticated,
+  uploadImage, // Ensure this middleware is only used when you are uploading images
+  authorizeRoles("admin"),
+UpdateQuestInSubject
+);
+
+// Delete a question
+courseRouter.delete(
+  "/course/:courseId/year/:yearId/subject/:subjectId/question/:questionId",
+  isAutheticated,
+  authorizeRoles("admin"),
+  DeleteQuestion
+);
 courseRouter.put(
   "/course/:courseId/year/:yearId",
   isAutheticated,

@@ -896,7 +896,140 @@ export const AddQuestToSubject = CatchAsyncError(async (req: Request, res: Respo
   }
 });
 
+//Update question to the subject
 
+export const UpdateQuestInSubject = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { courseId, yearId, subjectId, questionId } = req.params;
+    const { text, answers } = req.body;
+
+    if (!text || !Array.isArray(answers) || answers.length === 0) {
+      return res.status(400).json({ success: false, message: "Question text and at least one answer are required" });
+    }
+
+    // Upload new question image to Cloudinary if the question contains an image
+    let processedText = text;
+    if (typeof text === 'object' && text.type === 'image' && text.content) {
+      const result = await cloudinary.v2.uploader.upload(text.content, {
+        folder: 'questions',
+      });
+      processedText = { ...text, content: result.secure_url };
+    }
+
+    // Upload new images to Cloudinary if answers contain images
+    const uploadedAnswers = await Promise.all(
+      answers.map(async (answer: any) => {
+        if (answer.type === 'image' && answer.content) {
+          const result = await cloudinary.v2.uploader.upload(answer.content, {
+            folder: 'answers',
+          });
+          return {
+            ...answer,
+            content: result.secure_url,
+          };
+        }
+        return answer;
+      })
+    );
+
+    // Fetch the course
+    const course = await CourseModel.findById(courseId)
+      .populate({
+        path: 'years.subjects',
+        populate: {
+          path: 'questions'
+        }
+      });
+
+    if (!course) {
+      return res.status(404).json({ success: false, message: "Course not found" });
+    }
+
+    // Check for the year
+    const year = course.years.id(yearId);
+    if (!year) {
+      return res.status(404).json({ success: false, message: "Year not found" });
+    }
+
+    // Check for the subject
+    const subject = year.subjects.id(subjectId);
+    if (!subject) {
+      return res.status(404).json({ success: false, message: `Subject not found with ID: ${subjectId}` });
+    }
+
+    // Check for the question
+    const question = subject.questions.id(questionId);
+    if (!question) {
+      return res.status(404).json({ success: false, message: `Question not found with ID: ${questionId}` });
+    }
+
+    // Update the question and answers
+    question.set({ type: processedText.type, content: processedText.content, answers: uploadedAnswers });
+    await course.save();
+
+    res.status(200).json({
+      success: true,
+      course,
+      updatedQuestion: question
+    });
+
+  } catch (error: any) {
+    console.error(error); // Improved error logging
+    return next(new ErrorHandler(error.message, 500));
+  }
+});
+
+//delete question of subjects
+
+export const DeleteQuestFromSubject = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { courseId, yearId, subjectId, questionId } = req.params;
+
+    // Fetch the course
+    const course = await CourseModel.findById(courseId)
+      .populate({
+        path: 'years.subjects',
+        populate: {
+          path: 'questions'
+        }
+      });
+
+    if (!course) {
+      return res.status(404).json({ success: false, message: "Course not found" });
+    }
+
+    // Check for the year
+    const year = course.years.id(yearId);
+    if (!year) {
+      return res.status(404).json({ success: false, message: "Year not found" });
+    }
+
+    // Check for the subject
+    const subject = year.subjects.id(subjectId);
+    if (!subject) {
+      return res.status(404).json({ success: false, message: `Subject not found with ID: ${subjectId}` });
+    }
+
+    // Check for the question
+    const question = subject.questions.id(questionId);
+    if (!question) {
+      return res.status(404).json({ success: false, message: `Question not found with ID: ${questionId}` });
+    }
+
+    // Remove the question
+    question.remove();
+    await course.save();
+
+    res.status(200).json({
+      success: true,
+      message: `Question with ID ${questionId} successfully deleted.`
+    });
+
+  } catch (error: any) {
+    console.error(error); // Improved error logging
+    return next(new ErrorHandler(error.message, 500));
+  }
+});
 
 
 // Edit Question
