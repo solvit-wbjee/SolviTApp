@@ -816,8 +816,11 @@ export const DeleteSubject = CatchAsyncError(async (req: Request, res: Response,
 
 
 // Adding a Question to a Subject
-export const AddQuestToSubject = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
 
+
+
+
+export const AddQuestToSubject = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { courseId, yearId, subjectId } = req.params;
     const { text, answers } = req.body;
@@ -825,6 +828,31 @@ export const AddQuestToSubject = CatchAsyncError(async (req: Request, res: Respo
     if (!text || !Array.isArray(answers) || answers.length === 0) {
       return res.status(400).json({ success: false, message: "Question text and at least one answer are required" });
     }
+
+    // Upload question image to Cloudinary if the question contains an image
+    let processedText = text;
+    if (typeof text === 'object' && text.type === 'image' && text.content) {
+      const result = await cloudinary.v2.uploader.upload(text.content, {
+        folder: 'questions',
+      });
+      processedText = { ...text, content: result.secure_url };
+    }
+
+    // Upload images to Cloudinary if answers contain images
+    const uploadedAnswers = await Promise.all(
+      answers.map(async (answer: any) => {
+        if (answer.type === 'image' && answer.content) {
+          const result = await cloudinary.v2.uploader.upload(answer.content, {
+            folder: 'answers',
+          });
+          return {
+            ...answer,
+            content: result.secure_url,
+          };
+        }
+        return answer;
+      })
+    );
 
     const course = await CourseModel.findById(courseId);
     if (!course) {
@@ -841,10 +869,18 @@ export const AddQuestToSubject = CatchAsyncError(async (req: Request, res: Respo
       return res.status(404).json({ success: false, message: "Subject not found" });
     }
 
-    subject.questions.push({ text, answers });
+    subject.questions.push({ text: processedText, answers: uploadedAnswers });
     await course.save();
 
-    res.status(201).json({ success: true, course });
+    res.status(201).json({
+      success: true,
+      course,
+      uploadedImages: {
+        question: typeof processedText === 'object' && processedText.type === 'image' ? processedText.content : null,
+        answers: uploadedAnswers.filter(answer => answer.type === 'image').map(answer => answer.content)
+      }
+    });
+
   } catch (error: any) {
     return next(new ErrorHandler(error.message, 500));
   }
