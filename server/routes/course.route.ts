@@ -90,6 +90,12 @@ import {
   getCourseByUser,
   getSingleCourse,
   uploadCourse,
+  EditYear,
+  DeleteYear,
+  EditSubject,
+  DeleteSubject,
+  EditQuestion,
+  DeleteQuestion
 } from "../controllers/course.controller";
 import { authorizeRoles, isAutheticated } from "../middleware/auth";
 
@@ -127,6 +133,48 @@ courseRouter.post(
   uploadImage,
   authorizeRoles("admin"),
 )
+courseRouter.put(
+  "/course/:courseId/year/:yearId",
+  isAutheticated,
+  authorizeRoles("admin"),
+  EditYear
+);
+
+courseRouter.delete(
+  "/course/:courseId/year/:yearId",
+  isAutheticated,
+  authorizeRoles("admin"),
+  DeleteYear
+);
+
+courseRouter.put(
+  "/course/:courseId/year/:yearId/subject/:subjectId",
+  isAutheticated,
+  authorizeRoles("admin"),
+  EditSubject
+);
+
+courseRouter.delete(
+  "/course/:courseId/year/:yearId/subject/:subjectId",
+  isAutheticated,
+  authorizeRoles("admin"),
+  DeleteSubject
+);
+
+courseRouter.put(
+  "/course/:courseId/year/:yearId/subject/:subjectId/question/:questionId",
+  isAutheticated,
+  authorizeRoles("admin"),
+  EditQuestion
+);
+
+courseRouter.delete(
+  "/course/:courseId/year/:yearId/subject/:subjectId/question/:questionId",
+  isAutheticated,
+  authorizeRoles("admin"),
+  DeleteQuestion
+);
+//
 courseRouter.put(
   "/edit-course/:id",
   isAutheticated,

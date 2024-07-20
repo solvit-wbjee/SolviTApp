@@ -663,6 +663,59 @@ export const AddYeartoCourse = CatchAsyncError(async (req: Request, res: Respons
   }
 })
 
+// Edit Year
+export const EditYear = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { courseId, yearId } = req.params;
+    const { year } = req.body;
+
+    if (!year) {
+      return res.status(400).json({ success: false, message: 'Year is required' });
+    }
+
+    const course = await CourseModel.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ success: false, message: 'Course not found' });
+    }
+
+    const yearToEdit = course.years.id(yearId);
+    if (!yearToEdit) {
+      return res.status(404).json({ success: false, message: 'Year not found' });
+    }
+
+    yearToEdit.year = year;
+    await course.save();
+
+    res.status(200).json({ success: true, course });
+  } catch (error: any) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+});
+
+// Delete Year
+export const DeleteYear = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { courseId, yearId } = req.params;
+
+    const course = await CourseModel.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ success: false, message: 'Course not found' });
+    }
+
+    const yearToDelete = course.years.id(yearId);
+    if (!yearToDelete) {
+      return res.status(404).json({ success: false, message: 'Year not found' });
+    }
+
+    course.years.pull(yearToDelete._id);
+    await course.save();
+
+    res.status(200).json({ success: true, course });
+  } catch (error: any) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+});
+
 
 
 // Adding a Subject to a Year
@@ -696,6 +749,70 @@ export const AddSubjectToYear = CatchAsyncError(async (req: Request, res: Respon
     return next(new ErrorHandler(error.message, 500));
   }
 })
+
+// Edit Subject
+export const EditSubject = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { courseId, yearId, subjectId } = req.params;
+    const { name } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ success: false, message: 'Subject name is required' });
+    }
+
+    const course = await CourseModel.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ success: false, message: 'Course not found' });
+    }
+
+    const year = course.years.id(yearId);
+    if (!year) {
+      return res.status(404).json({ success: false, message: 'Year not found' });
+    }
+
+    const subjectToEdit = year.subjects.id(subjectId);
+    if (!subjectToEdit) {
+      return res.status(404).json({ success: false, message: 'Subject not found' });
+    }
+
+    subjectToEdit.name = name;
+    await course.save();
+
+    res.status(200).json({ success: true, course });
+  } catch (error: any) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+});
+
+// Delete Subject
+export const DeleteSubject = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { courseId, yearId, subjectId } = req.params;
+
+    const course = await CourseModel.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ success: false, message: 'Course not found' });
+    }
+
+    const year = course.years.id(yearId);
+    if (!year) {
+      return res.status(404).json({ success: false, message: 'Year not found' });
+    }
+
+    const subjectToDelete = year.subjects.id(subjectId);
+    if (!subjectToDelete) {
+      return res.status(404).json({ success: false, message: 'Subject not found' });
+    }
+
+    year.subjects.pull(subjectToDelete._id);
+    await course.save();
+
+    res.status(200).json({ success: true, course });
+  } catch (error: any) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+});
+
 
 
 // Adding a Question to a Subject
@@ -732,6 +849,80 @@ export const AddQuestToSubject = CatchAsyncError(async (req: Request, res: Respo
     return next(new ErrorHandler(error.message, 500));
   }
 })
+
+// Edit Question
+export const EditQuestion = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { courseId, yearId, subjectId, questionId } = req.params;
+    const { text, answers } = req.body;
+
+    if (!text || !Array.isArray(answers) || answers.length === 0) {
+      return res.status(400).json({ success: false, message: 'Question text and at least one answer are required' });
+    }
+
+    const course = await CourseModel.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ success: false, message: 'Course not found' });
+    }
+
+    const year = course.years.id(yearId);
+    if (!year) {
+      return res.status(404).json({ success: false, message: 'Year not found' });
+    }
+
+    const subject = year.subjects.id(subjectId);
+    if (!subject) {
+      return res.status(404).json({ success: false, message: 'Subject not found' });
+    }
+
+    const questionToEdit = subject.questions.id(questionId);
+    if (!questionToEdit) {
+      return res.status(404).json({ success: false, message: 'Question not found' });
+    }
+
+    questionToEdit.text = text;
+    questionToEdit.answers = answers;
+    await course.save();
+
+    res.status(200).json({ success: true, course });
+  } catch (error: any) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+});
+
+// Delete Question
+export const DeleteQuestion = CatchAsyncError(async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { courseId, yearId, subjectId, questionId } = req.params;
+
+    const course = await CourseModel.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ success: false, message: 'Course not found' });
+    }
+
+    const year = course.years.id(yearId);
+    if (!year) {
+      return res.status(404).json({ success: false, message: 'Year not found' });
+    }
+
+    const subject = year.subjects.id(subjectId);
+    if (!subject) {
+      return res.status(404).json({ success: false, message: 'Subject not found' });
+    }
+
+    const questionToDelete = subject.questions.id(questionId);
+    if (!questionToDelete) {
+      return res.status(404).json({ success: false, message: 'Question not found' });
+    }
+
+    subject.questions.pull(questionToDelete._id);
+    await course.save();
+
+    res.status(200).json({ success: true, course });
+  } catch (error: any) {
+    return next(new ErrorHandler(error.message, 500));
+  }
+});
 
 
 
