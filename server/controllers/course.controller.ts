@@ -647,6 +647,7 @@ export const uploadCourse = CatchAsyncError(
         };
       }
 
+      
       // Remove `years` from the data before creating the course
       const { years, ...courseData } = data;
 
